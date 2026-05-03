@@ -1,20 +1,30 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ListRenderItem } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CategoryStackParamList } from '../types/types';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 2;
 const PADDING = 15;
 const ITEM_WIDTH = (width - (PADDING * (COLUMN_COUNT + 1))) / COLUMN_COUNT;
 
-const CATEGORIES = [
+interface CategoryData {
+  id: string;
+  name: string;
+  image: any;
+}
+
+const CATEGORIES: CategoryData[] = [
   { id: '1', name: 'Pooja Essentials', image: require('../images/camphor.jpg') },
   { id: '2', name: 'Fragrances', image: require('../images/incense & dhoop.jpg') },
   { id: '3', name: 'Brass Items', image: require('../images/bell.jpg') },
   { id: '4', name: 'Auspicious Powders', image: require('../images/kumkum & haldi.jpg') },
 ];
 
-const CategoriesScreen = ({ navigation }) => {
-  const renderItem = ({ item }) => (
+type Props = NativeStackScreenProps<CategoryStackParamList, 'CategoriesList'>;
+
+const CategoriesScreen = ({ navigation }: Props) => {
+  const renderItem: ListRenderItem<CategoryData> = ({ item }) => (
     <TouchableOpacity 
       style={styles.card} 
       onPress={() => navigation.navigate('CategoryProducts', { categoryName: item.name })}

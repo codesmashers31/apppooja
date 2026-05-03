@@ -3,11 +3,16 @@ import { Alert, Text, TextInput, View, StyleSheet, TouchableOpacity } from "reac
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList, User } from '../types/types';
+import { AppDispatch } from '../redux/store';
 
-const LoginScreen = ({ navigation }) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
+const LoginScreen = ({ navigation }: Props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -17,12 +22,12 @@ const LoginScreen = ({ navigation }) => {
         
         try {
             const existingUsersRaw = await AsyncStorage.getItem('registeredUsers');
-            const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+            const existingUsers: User[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
             
-            const validUser = existingUsers.find(u => u.email === email && u.password === password);
+            const validUser = existingUsers.find((u) => u.email === email && u.password === password);
             
             if (validUser) {
-                dispatch(login({ email: validUser.email, name: validUser.name }));
+                dispatch(login({ email: validUser.email, name: validUser.name, mobile: validUser.mobile, gender: validUser.gender }));
             } else {
                 Alert.alert("Login Failed", "Please enter the correct email and password");
             }

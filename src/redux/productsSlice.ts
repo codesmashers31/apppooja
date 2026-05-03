@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { Product } from '../types/types';
 
-const MOCK_PRODUCTS = [
+const MOCK_PRODUCTS: Product[] = [
   { id: '1', name: 'Pan Leaves', unit: '5 pcs', price: 20, category: 'Pooja Essentials', image: require('../images/Pan Leavesjpg.jpg') },
   { id: '2', name: 'Pooja Bell', unit: '1 pc', price: 150, category: 'Brass Items', image: require('../images/bell.jpg') },
   { id: '3', name: 'Camphor', unit: '50g', price: 50, category: 'Pooja Essentials', image: require('../images/camphor.jpg') },
@@ -15,7 +16,11 @@ const MOCK_PRODUCTS = [
   { id: '12', name: 'Havan Wood Pieces', unit: '1 kg', price: 110, category: 'Pooja Essentials', image: require('../images/woodpieces.jpg') },
 ];
 
-const initialState = {
+interface ProductsState {
+  items: Product[];
+}
+
+const initialState: ProductsState = {
   items: MOCK_PRODUCTS,
 };
 

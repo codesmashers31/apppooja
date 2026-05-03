@@ -16,9 +16,12 @@ import SearchScreen from '../screens/SearchScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import CategoryProductsScreen from '../screens/CategoryProductsScreen';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-const CategoryStack = createNativeStackNavigator();
+import { RootState, AppDispatch } from '../redux/store';
+import { RootStackParamList, MainTabParamList, CategoryStackParamList } from '../types/types';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+const CategoryStack = createNativeStackNavigator<CategoryStackParamList>();
 
 const CategoryStackScreen = () => {
   return (
@@ -30,7 +33,7 @@ const CategoryStackScreen = () => {
 };
 
 const MainTabs = () => {
-  const cartItems = useSelector((state) => state.cart.totalQuantity);
+  const cartItems = useSelector((state: RootState) => state.cart.totalQuantity);
 
   return (
     <Tab.Navigator
@@ -56,7 +59,7 @@ const MainTabs = () => {
       <Tab.Screen 
         name="Cart" 
         component={CartScreen} 
-        options={{ tabBarBadge: cartItems > 0 ? cartItems : null }}
+        options={{ tabBarBadge: cartItems > 0 ? cartItems : undefined }}
       />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -64,8 +67,8 @@ const MainTabs = () => {
 };
 
 const AppNavigator = () => {
-  const { user, isLoading } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const { user, isLoading } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const checkUser = async () => {

@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, ScrollView 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, updateUser } from '../redux/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RootState, AppDispatch } from '../redux/store';
+import { User } from '../types/types';
 
 const ProfileScreen = () => {
-  const user = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -25,15 +27,12 @@ const ProfileScreen = () => {
     }
 
     try {
-      // Fetch all registered users to update the specific one
       const existingUsersRaw = await AsyncStorage.getItem('registeredUsers');
-      let existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+      let existingUsers: User[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
 
-      // Find user by their OLD email (user.email is the old one)
-      const userIndex = existingUsers.findIndex(u => u.email === user.email);
+      const userIndex = existingUsers.findIndex(u => u.email === user?.email);
 
       if (userIndex !== -1) {
-        // Keep the password the same, update other fields
         const updatedUserData = {
           ...existingUsers[userIndex],
           name,
@@ -45,7 +44,6 @@ const ProfileScreen = () => {
         
         await AsyncStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
         
-        // Update current session
         dispatch(updateUser({ name, email, mobile, gender }));
         Alert.alert("Success", "Profile updated successfully!");
         setIsEditing(false);
@@ -58,7 +56,6 @@ const ProfileScreen = () => {
   };
 
   const handleCancel = () => {
-    // Reset to current Redux state
     setName(user?.name || '');
     setEmail(user?.email || '');
     setMobile(user?.mobile || '');
@@ -70,7 +67,7 @@ const ProfileScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileHeader}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{name.charAt(0).toUpperCase() || 'U'}</Text>
+          <Text style={styles.avatarText}>{name ? name.charAt(0).toUpperCase() : 'U'}</Text>
         </View>
         {!isEditing && (
           <>

@@ -1,27 +1,25 @@
 import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions, Alert, ListRenderItem } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import { RootState, AppDispatch } from '../redux/store';
+import { Product } from '../types/types';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 2;
 const PADDING = 10;
 const ITEM_WIDTH = (width - (PADDING * (COLUMN_COUNT + 1))) / COLUMN_COUNT;
 
-const CategoryProductsScreen = ({ route }) => {
-  const { categoryName } = route.params;
-  const allProducts = useSelector((state) => state.products.items);
-  const dispatch = useDispatch();
+const ProductsScreen = () => {
+  const products = useSelector((state: RootState) => state.products.items);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // Filter products by category
-  const products = allProducts.filter(item => item.category === categoryName);
-
-  const handleAdd = (product) => {
+  const handleAdd = (product: Product) => {
     dispatch(addToCart(product));
     Alert.alert('Added', `${product.name} added to cart`);
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem: ListRenderItem<Product> = ({ item }) => {
     return (
       <View style={styles.card}>
         <Image source={item.image} style={styles.image} resizeMode="cover" />
@@ -49,11 +47,6 @@ const CategoryProductsScreen = ({ route }) => {
         numColumns={COLUMN_COUNT}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
-            <Text style={{ color: 'gray' }}>No products found in this category.</Text>
-          </View>
-        }
       />
     </View>
   );
@@ -122,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CategoryProductsScreen;
+export default ProductsScreen;

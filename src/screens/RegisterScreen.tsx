@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Alert, Text, TextInput, View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList, User } from '../types/types';
 
-const RegisterScreen = ({ navigation }) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
+
+const RegisterScreen = ({ navigation }: Props) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -44,13 +48,11 @@ const RegisterScreen = ({ navigation }) => {
             return;
         }
 
-        // Save user details
-        const newUser = { name, email, password, mobile, gender };
+        const newUser: User = { name, email, password, mobile, gender };
         try {
             const existingUsersRaw = await AsyncStorage.getItem('registeredUsers');
-            const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+            const existingUsers: User[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
             
-            // Check if email already registered
             const userExists = existingUsers.find(u => u.email === email);
             if (userExists) {
                 Alert.alert("Error", "Email is already registered!");
@@ -67,7 +69,7 @@ const RegisterScreen = ({ navigation }) => {
         }
     }
 
-    const validateEmail = (email) => {
+    const validateEmail = (email: string) => {
         if (email !== email.toLowerCase()) return false;
         if (!email.endsWith("@gmail.com")) return false;
 
@@ -81,7 +83,7 @@ const RegisterScreen = ({ navigation }) => {
         return hasNumber;
     };
 
-    const validatePassword = (password) => {
+    const validatePassword = (password: string) => {
         if (password.length < 8) return false;
 
         let hasUpper = false;

@@ -1,22 +1,24 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ListRenderItem, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCart, clearCart } from '../redux/cartSlice';
+import { RootState, AppDispatch } from '../redux/store';
+import { CartItem } from '../types/types';
 
 const CartScreen = () => {
-  const cart = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
+  const cart = useSelector((state: RootState) => state.cart);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const handleRemove = (id) => {
+  const handleRemove = (id: string) => {
     dispatch(removeFromCart(id));
   };
 
   const handleCheckout = () => {
-    alert('Checkout successful!');
+    Alert.alert('Checkout successful!');
     dispatch(clearCart());
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem: ListRenderItem<CartItem> = ({ item }) => (
     <View style={styles.cartItem}>
       <View style={styles.itemInfo}>
         <Text style={styles.name}>{item.name}</Text>

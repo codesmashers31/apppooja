@@ -1,29 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions, Alert, TextInput } from 'react-native';
+import React from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions, Alert, ListRenderItem } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CategoryStackParamList, Product } from '../types/types';
+import { RootState, AppDispatch } from '../redux/store';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 2;
 const PADDING = 10;
 const ITEM_WIDTH = (width - (PADDING * (COLUMN_COUNT + 1))) / COLUMN_COUNT;
 
-const SearchScreen = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const allProducts = useSelector((state) => state.products.items);
-  const dispatch = useDispatch();
+type Props = NativeStackScreenProps<CategoryStackParamList, 'CategoryProducts'>;
 
-  // Filter products based on search query
-  const filteredProducts = allProducts.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+const CategoryProductsScreen = ({ route }: Props) => {
+  const { categoryName } = route.params;
+  const allProducts = useSelector((state: RootState) => state.products.items);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const handleAdd = (product) => {
+  // Filter products by category
+  const products = allProducts.filter((item) => item.category === categoryName);
+
+  const handleAdd = (product: Product) => {
     dispatch(addToCart(product));
     Alert.alert('Added', `${product.name} added to cart`);
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem: ListRenderItem<Product> = ({ item }) => {
     return (
       <View style={styles.card}>
         <Image source={item.image} style={styles.image} resizeMode="cover" />
@@ -44,33 +47,16 @@ const SearchScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for pooja items..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCapitalize="none"
-        />
-      </View>
-
-      {/* Results List */}
       <FlatList
-        data={filteredProducts}
+        data={products}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={COLUMN_COUNT}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
-            {searchQuery.length > 0 ? (
-              <Text style={{ color: 'gray' }}>No items match your search.</Text>
-            ) : (
-              <Text style={{ color: 'gray' }}>Start typing to search...</Text>
-            )}
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No products found in this category.</Text>
           </View>
         }
       />
@@ -83,28 +69,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-  searchContainer: {
-    padding: PADDING,
-    backgroundColor: '#fff',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    zIndex: 10,
-  },
-  searchInput: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: '#333',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
   listContainer: {
     padding: PADDING,
+  },
+  emptyContainer: {
+    alignItems: 'center', 
+    marginTop: 50,
+  },
+  emptyText: {
+    color: 'gray',
   },
   card: {
     width: ITEM_WIDTH,
@@ -161,4 +134,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchScreen;
+export default CategoryProductsScreen;
